@@ -17,8 +17,8 @@ def big_geo_preproc():
     image_width = 800
     #image_height_translation = 0
     df['Culvert Local Y'] = 800 - df['Culvert Local Y']
-
-    df = df.groupby(['Sample ID','Sample Name']).aggregate(lambda x: list(x)).reset_index()
+    print(df)
+    df = df.groupby(['Sample ID']).aggregate(lambda x: list(x)).reset_index()
 
 
     if not os.path.exists(out_dir):
@@ -40,6 +40,6 @@ def big_geo_preproc():
             writer.save(out_dir+'/'+str(id)+'.xml')
             
 
-    df.apply(lambda x: generate_xml('./Sample800_norm/'+x['Sample Name'],os.path.splitext(x['Sample Name'])[0],x['Culvert Local X'],x['Culvert Local Y'],BOUND_SIZE),axis=1)
+    df.apply(lambda x: generate_xml('./Sample800_norm/'+str(x['Sample ID']),os.path.splitext(str(x['Sample ID']))[0],x['Culvert Local X'],x['Culvert Local Y'],BOUND_SIZE),axis=1)
 
 

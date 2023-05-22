@@ -4,6 +4,14 @@
 import os
 import pandas as pd
 
+
+def xlsx_to_csv(datafile):
+    if os.path.isfile(datafile):
+        df = pd.read_excel(datafile, index_col=[0])
+        df.to_csv("./coordinates_Bbox.csv", sep=",")
+    
+    
+
 def rename_files():
     folders_path = "./Sample800"
     for directname, directnames, files in os.walk(folders_path):
@@ -29,8 +37,9 @@ def rename_files():
             filename = name + ext
         return filename
 
-    df = pd.read_csv('Coordinate_in_Bbox.csv')
-    df['Sample Name'] = df['Sample Name'].apply(remove_period)
-    print(df)
-    df.to_csv('./coordinates_Bbox.csv')
+    xlsx_to_csv("./data/coordinate in Bbox_Sept24.xlsx")
+    #df = pd.read_csv('./Coordinate_in_Bbox.csv')
+    #df['Sample Name'] = df['Sample Name'].apply(remove_period)
+    #print(df)
+    #df.to_csv('./coordinates_Bbox.csv')
 
