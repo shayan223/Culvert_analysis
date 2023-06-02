@@ -145,4 +145,3 @@ if __name__ == "__main__":
     for i in range(NUM_SAMPLES_TO_VISUALIZE):
         image, target = dataset[i]
         visualize_sample(image, target)
-

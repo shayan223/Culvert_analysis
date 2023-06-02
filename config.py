@@ -7,6 +7,7 @@ import torch
 
 is_available = torch.cuda.is_available()
 DEVICE = torch.device("cuda") if is_available else torch.device("cpu")
+DETR_DIR = "./detr"
 
 BATCH_SIZE = 4
 RESIZE_TO = 800
@@ -22,7 +23,6 @@ VISUALIZE_TRANSFORMED_IMAGES = False
 OUT_DIR = "./outputs"
 SAVE_PLOTS_EPOCH = 2
 SAVE_MODEL_EPOCH = 2
-
 
 IMAGE_SPLIT_DIM = (400)
 INFER_FALSE_LABELS = False

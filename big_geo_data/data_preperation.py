@@ -34,12 +34,12 @@ def main():
 
     args = parser.parse_args()
 
-    # if args.rename or args.first_time_setup:
-    #     print("############## Renaming Files ###############")
-    #     rename_files()
-    # if args.normalize or args.first_time_setup:
-    #     print("############## Normalizing Images ###############")
-    #     normalize_images()
+    if args.rename or args.first_time_setup:
+        print("############## Renaming Files ###############")
+        rename_files()
+    if args.normalize or args.first_time_setup:
+        print("############## Normalizing Images ###############")
+        normalize_images()
 
     big_geo_preproc()
     export()

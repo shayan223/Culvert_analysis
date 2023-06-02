@@ -161,5 +161,6 @@ def inference():
     if not os.path.exists("./validation_results/"):
         os.makedirs("./validation_results/")
     validation_results.to_csv("./validation_results/validation_results.csv")
+
     print("TEST PREDICTIONS COMPLETE")
     cv2.destroyAllWindows()

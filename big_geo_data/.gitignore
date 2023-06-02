@@ -9,6 +9,7 @@ trainval/
 val/
 val_xml/
 data/
+val_xml
 __pycache__
 *.csv
 *.zip
