@@ -1,0 +1,12 @@
+# for Dino detr 4 convscale
+python engine_DINO.py -c config/DINO/DINO_4scale.py -m "cuda"
+
+# for Dino 4 convscale swin tansformer
+python engine_DINO.py -c config/DINO/DINO_4scale_swin.py -m "cuda"
+
+#for validation or inference on validation data
+# Dino models
+ 1. For 4 convscale check the path of the saved model in the inference.py  and run  python validate.py -c config/DINO/DINO_4scale.py -m "cuda"
+ 2. For 4 convscale swin transformer check the path of the saved model in the inference.py  and run  python validate.py -c config/DINO/DINO_4scale_swin.py -m "cuda"
+
+# engine_DINO has the code to load the detr architecture according to the command 
