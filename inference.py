@@ -25,7 +25,7 @@ from model import create_model
 
 def inference():
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    model = create_model(num_classes=NUM_CLASSES).to(device)
+    model = create_model().to(device)
     model.load_state_dict(
         torch.load("./outputs/model" + str(NUM_EPOCHS) + ".pth", map_location=device)
     )
@@ -62,14 +62,11 @@ def inference():
         image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB).astype(np.float32)
         image /= 255.0
         image = np.transpose(image, (2, 0, 1)).astype(float)
-        image = torch.tensor(image, dtype=torch.float).cuda()
+        image = torch.tensor(image, dtype=torch.float)
         image = torch.unsqueeze(image, 0)
 
         with torch.no_grad():
             outputs = model(image)
-
-        outputs = [{k: v.to("cpu") for k, v in t.items()} for t in outputs]
-        outputs = outputs[0]
 
         print(outputs)
 

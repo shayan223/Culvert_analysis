@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
 import os
 import time
 
@@ -10,7 +9,7 @@ from tqdm.auto import tqdm
 
 from sklearn.model_selection import KFold
 
-from config import DEVICE, NUM_CLASSES, NUM_EPOCHS, OUT_DIR
+from config import DEVICE, NUM_CLASSES, NUM_EPOCHS, OUT_DIR, BATCH_SIZE
 from config import VISUALIZE_TRANSFORMED_IMAGES
 from config import SAVE_MODEL_EPOCH, SAVE_PLOTS_EPOCH
 from datasets import train_loader, valid_loader
@@ -38,12 +37,13 @@ def train(train_data_loader, model):
         targets = [{k: v.to(DEVICE) for k, v in t.items()} for t in targets]
 
         loss_dict = model(images)
-        loss_dict = model()
-        losses = sum(loss for loss in loss_dict.values())
-        loss_value = losses.item()
-        train_loss_list.append(loss_value)
-        train_loss_hist.send(loss_value)
-        losses.backward()
+        losses = [loss for loss in loss_dict.values()]
+
+        for loss_tensor in losses:
+            loss_value = loss_tensor.mean().item()
+            train_loss_list.append(loss_value)
+            train_loss_hist.send(loss_value)
+
         optimizer.step()
         train_itr += 1
 
@@ -67,12 +67,16 @@ def validate(valid_data_loader, model):
         targets = [{k: v.to(DEVICE) for k, v in t.items()} for t in targets]
 
         with torch.no_grad():
-            loss_dict = model(images, targets)
+            loss_dict = model(images)
 
-        losses = sum(loss for loss in loss_dict.values())
-        loss_value = losses.item()
-        val_loss_list.append(loss_value)
-        val_loss_hist.send(loss_value)
+        losses = [loss for loss in loss_dict.values()]
+
+        for loss_tensor in losses:
+            loss_value = loss_tensor.mean().item()
+            train_loss_list.append(loss_value)
+            train_loss_hist.send(loss_value)
+
+        optimizer.step()
         val_itr += 1
 
         prog_bar.set_description(desc=f"Loss: {loss_value:.4f}")
@@ -81,7 +85,7 @@ def validate(valid_data_loader, model):
 
 
 if __name__ == "__main__":
-    model = create_model(NUM_CLASSES).to(DEVICE)
+    model = create_model().to(DEVICE)
 
     params = [p for p in model.parameters() if p.requires_grad]
 
@@ -112,6 +116,7 @@ if __name__ == "__main__":
         figure_2, valid_ax = plt.subplots()
 
         start = time.time()
+
         train_loss = train(train_loader, model)
         val_loss = validate(valid_loader, model)
 
