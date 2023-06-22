@@ -1,16 +1,21 @@
+import os
+
 import numpy as np
 import pandas as pd
-import os
 from pascal_voc_writer import Writer
+
+from . import config
 
 
 def big_geo_preproc():
-    out_dir = "./annotations"
-    df = pd.read_csv("./coordinates_Bbox.csv")
+    out_dir = config.ANNOTATIONS_LOCATION
+    df = pd.read_csv(config.COORDINATES_BBOX_LOCATION)
 
     BOUND_SIZE = 50
+
     image_height = 800
     image_width = 800
+
     df["Culvert Local Y"] = 800 - df["Culvert Local Y"]
 
     print(df)
@@ -29,11 +34,11 @@ def big_geo_preproc():
             ymax = int(np.clip(y[i] + n, 0, image_height))
 
             writer.addObject("True", xmin, ymin, xmax, ymax)
-            writer.save(out_dir + "/" + str(id) + ".xml")
+            writer.save(f"{out_dir}/{id}.xml")
 
     df.apply(
         lambda x: generate_xml(
-            "./Sample800_norm/" + str(x["Sample ID"]),
+            f"{config.SAMPLES800_NORM_LOCATION}{x['Sample ID']}",
             os.path.splitext(str(x["Sample ID"]))[0],
             x["Culvert Local X"],
             x["Culvert Local Y"],

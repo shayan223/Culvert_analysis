@@ -1,7 +1,7 @@
 import cv2
 
 
-img = cv2.imread("./train/1001.tif", -1)
+img = cv2.imread("../train/1001.tif", -1)
 print(img)
 
 print(img.shape)

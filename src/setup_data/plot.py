@@ -32,7 +32,7 @@ def filterFiles(directoryPath, extension):
 
 [image_names, numberOfFiles] = filterFiles("ImageSets", "tif")
 
-trainRCNN = pd.read_csv("test.csv", sep=",", header=None)
+trainRCNN = pd.read_csv("../test.csv", sep=",", header=None)
 trainRCNN.columns = ["filename", "box_type", "xmin", "xmax", "ymin", "ymax"]
 
 

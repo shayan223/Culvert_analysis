@@ -1,5 +1,3 @@
-__pycache__
-validation_qualitative
-validation_results/*.csv
-outputs/
-.vscode/
+**__pycache__**
+data/
+.vscode

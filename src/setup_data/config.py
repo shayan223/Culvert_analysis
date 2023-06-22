@@ -1,0 +1,10 @@
+DATA_ROOT = "../../data"
+
+COORDINATES_BBOX_LOCATION = f"{DATA_ROOT}/coordinates_Bbox.csv"
+COORDINATES_BBOX_XLS_LOCATION = f"{DATA_ROOT}/coordinate in Bbox_Sept24.xlsx"
+SAMPLES800_NORM_LOCATION = f"{DATA_ROOT}/Sample800_norm"
+ANNOTATIONS_LOCATION = f"{DATA_ROOT}/annotations"
+
+IMAGE_SETS_LOCATION = f"{DATA_ROOT}/ImageSets"
+
+DATA_PATH = f"{DATA_ROOT}/CA"

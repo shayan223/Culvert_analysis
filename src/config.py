@@ -7,20 +7,19 @@ import torch
 
 is_available = torch.cuda.is_available()
 DEVICE = torch.device("cuda") if is_available else torch.device("cpu")
-DETR_DIR = "./detr"
 
 BATCH_SIZE = 4
 RESIZE_TO = 800
 NUM_EPOCHS = 1
 
-TRAIN_DIR = "./big_geo_data/train"
-VALID_DIR = "./big_geo_data/test"
+TRAIN_DIR = "data/train"
+VALID_DIR = "data/test"
 
 IMAGE_TYPE = "tif"
 CLASSES = ["Background", "True"]
 NUM_CLASSES = len(CLASSES)
 VISUALIZE_TRANSFORMED_IMAGES = False
-OUT_DIR = "./outputs"
+OUT_DIR = "data/outputs"
 SAVE_PLOTS_EPOCH = 2
 SAVE_MODEL_EPOCH = 2
 

@@ -5,10 +5,12 @@ import imageio.v2 as imageio
 import numpy as np
 from tqdm import tqdm
 
+from . import config
+
 
 def normalize_images():
-    PATH = "./data/CA"
-    OUT_PATH = "./Sample800_norm"
+    PATH = config.DATA_PATH
+    OUT_PATH = config.SAMPLES800_NORM_LOCATION
     FILE_TYPE = ".tif"
 
     if not os.path.exists(OUT_PATH):

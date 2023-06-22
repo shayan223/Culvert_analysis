@@ -13,9 +13,11 @@ import xml.etree.ElementTree as ET
 
 import pandas as pd
 
+from . import config
+
 
 def export():
-    annotations = glob("annotations/*.xml")
+    annotations = glob(f"{config.ANNOTATIONS_LOCATION}/*.xml")
 
     df = []
     cnt = 0

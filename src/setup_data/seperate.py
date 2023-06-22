@@ -1,10 +1,13 @@
 import os
-import pandas as pd
 import shutil
+
+import pandas as pd
+
+from . import config
 
 
 def seperate_files():
-    IMAGE_DIR = "./Sample800_norm"
+    IMAGE_DIR = config.SAMPLES800_NORM_LOCATION
 
     def seperate_images(file_path, source, destination, validation=False):
         file_list = pd.read_csv(file_path, dtype=str, names=["file"])
@@ -24,7 +27,7 @@ def seperate_files():
             if current_file in file_list:
                 filename = os.path.join(source, filename)
                 annotation_file = os.path.join(
-                    "./annotations",
+                    config.ANNOTATIONS_LOCATION,
                     current_file + ".xml",
                 )
 
@@ -38,7 +41,9 @@ def seperate_files():
                 else:
                     shutil.copy(annotation_file, destination + "_xml")
 
-    seperate_images("ImageSets/train.txt", IMAGE_DIR, "./train")
-    seperate_images("ImageSets/test.txt", IMAGE_DIR, "./test")
-    seperate_images("ImageSets/trainval.txt", IMAGE_DIR, "./trainval")
-    seperate_images("ImageSets/val.txt", IMAGE_DIR, "./val", validation=True)
+    image_sets = config.IMAGE_SETS_LOCATION
+    data_root = config.DATA_ROOT
+    seperate_images(f"{image_sets}/train.txt", IMAGE_DIR, f"{data_root}/train")
+    seperate_images(f"{image_sets}/test.txt", IMAGE_DIR, f"{data_root}/test")
+    seperate_images(f"{image_sets}/trainval.txt", IMAGE_DIR, f"{data_root}/trainval")
+    seperate_images(f"{image_sets}/val.txt", IMAGE_DIR, f"{data_root}/val", validation=True)
