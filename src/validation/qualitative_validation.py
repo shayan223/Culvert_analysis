@@ -13,10 +13,12 @@ from matplotlib import patches
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from src.config import CLASSIFIED_IMAGES_DIR as VAL_PATH
+from src.config import VALIDATION_QUALITATIVE_DIR as VAL_QUAL_DIR
+from src.config import VALIDATION_RESULTS_DIR as VAL_RES_DIR
+
 
 def qualitative_validation():
-    VAL_PATH = "./big_geo_data/classified_images/"
-
     def filterFiles(directoryPath, extension):
         relevant_path = directoryPath
         included_extensions = [extension]
@@ -31,7 +33,7 @@ def qualitative_validation():
 
     [image_names, _] = filterFiles(VAL_PATH, "jpg")
 
-    trainRCNN = pd.read_csv("validation_results/val_labels.csv", sep=",")
+    trainRCNN = pd.read_csv(os.path.join(VAL_RES_DIR, "val_labels.csv"), sep=",")
     trainRCNN.columns = [
         "filename",
         "box_type",
@@ -102,11 +104,11 @@ def qualitative_validation():
             except Exception as e:
                 raise e
 
-            if not os.path.exists("validation_qualitative"):
-                os.makedirs("validation_qualitative")
+            if not os.path.exists(VAL_QUAL_DIR):
+                os.makedirs(VAL_QUAL_DIR)
 
             img_name = os.path.splitext(imageFileName)[0]
-            full_path = f"validation_qualitative/{img_name}.jpg"
+            full_path = os.path.join(VAL_QUAL_DIR, f"{img_name}.jpg")
             fig.savefig(
                 full_path,
                 dpi=90,
@@ -114,6 +116,6 @@ def qualitative_validation():
             )
 
         plt.close()
-        print(f"ImageName: {imageFileName} is saved to validation_qualitative")
+        print(f"ImageName: {imageFileName} is saved to {VAL_QUAL_DIR}")
 
     print("PLOTBOX COMPLETED!")

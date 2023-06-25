@@ -3,7 +3,7 @@ import shutil
 
 import pandas as pd
 
-from . import config
+from src import config
 
 
 def seperate_files():
@@ -11,15 +11,14 @@ def seperate_files():
 
     def seperate_images(file_path, source, destination, validation=False):
         file_list = pd.read_csv(file_path, dtype=str, names=["file"])
-        print(file_list)
         file_list = file_list["file"].tolist()
 
         if not os.path.exists(destination):
             os.makedirs(destination)
 
         if not validation:
-            if not os.path.exists(destination + "_xml"):
-                os.makedirs(destination + "_xml")
+            if not os.path.exists(f"{destination}_xml"):
+                os.makedirs(f"{destination}_xml")
 
         for filename in os.listdir(source):
             current_file = os.path.splitext(filename)[0]
@@ -28,18 +27,16 @@ def seperate_files():
                 filename = os.path.join(source, filename)
                 annotation_file = os.path.join(
                     config.ANNOTATIONS_LOCATION,
-                    current_file + ".xml",
+                    f"{current_file}.xml",
                 )
 
-                print(annotation_file)
                 os.path.join(source, filename)
-                print(f"Copying {filename}")
                 shutil.copy(filename, destination)
 
                 if not validation:
                     shutil.copy(annotation_file, destination)
                 else:
-                    shutil.copy(annotation_file, destination + "_xml")
+                    shutil.copy(annotation_file, f"{destination}_xml")
 
     image_sets = config.IMAGE_SETS_LOCATION
     data_root = config.DATA_ROOT

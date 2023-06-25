@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pascal_voc_writer import Writer
 
-from . import config
+from src import config
 
 
 def big_geo_preproc():
@@ -17,8 +17,6 @@ def big_geo_preproc():
     image_width = 800
 
     df["Culvert Local Y"] = 800 - df["Culvert Local Y"]
-
-    print(df)
 
     df = df.groupby(["Sample ID"]).aggregate(lambda x: list(x)).reset_index()
 
@@ -34,7 +32,8 @@ def big_geo_preproc():
             ymax = int(np.clip(y[i] + n, 0, image_height))
 
             writer.addObject("True", xmin, ymin, xmax, ymax)
-            writer.save(f"{out_dir}/{id}.xml")
+            out_path = os.path.join(out_dir, f"{id}.xml")
+            writer.save(out_path)
 
     df.apply(
         lambda x: generate_xml(

@@ -5,8 +5,7 @@ import imageio.v2 as imageio
 import numpy as np
 from tqdm import tqdm
 
-from . import config
-
+from src import config
 
 def normalize_images():
     PATH = config.DATA_PATH
@@ -36,7 +35,7 @@ def normalize_images():
 
     for filename in tqdm(file_list):
         if filename.endswith(FILE_TYPE):
-            norm = normalize_image(
-                f"{PATH}/{filename}",
-                f"{OUT_PATH}/{filename}",
+            normalize_image(
+                os.path.join(PATH, filename),
+                os.path.join(OUT_PATH, filename),
             )

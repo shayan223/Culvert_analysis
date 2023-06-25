@@ -1,3 +1,5 @@
+import os
+
 from ast import literal_eval
 from collections import namedtuple
 
@@ -8,14 +10,16 @@ import seaborn as sb
 from sklearn.metrics import confusion_matrix
 from tqdm import tqdm
 
+from src.config import VALIDATION_RESULTS_DIR as VAL_RES_DIR
+
 
 def analyse_val():
     Rectangle = namedtuple("Rectangle", "xmin ymin xmax ymax")
 
     val_res = pd.read_csv(
-        "./validation_results/validation_results.csv", index_col=False
+        os.path.join(VAL_RES_DIR, "validation_results.csv"), index_col=False
     )
-    labels = pd.read_csv("./validation_results/val_labels.csv")
+    labels = pd.read_csv(os.path.join(VAL_RES_DIR, "val_labels.csv"))
 
     labels = (
         labels.groupby(
@@ -181,11 +185,14 @@ def analyse_val():
     print("Accuracy: ", accuracy)
 
     ax = plt.subplot()
+
     alt_title = f"Accuracy: {accuracy}, IOU: {avg_overlap}\n"
     alt_title += f"Miss: {label_miss_rate}, Extra: {extra_label_rate}"
 
     sb.heatmap(conf_mat, annot=True, fmt="d").set(title=alt_title)
+
     ax.set_xlabel("Predicted labels")
     ax.set_ylabel("True labels")
-    plt.savefig("./validation_results/confusion_matrix")
+
+    plt.savefig(os.path.join(VAL_RES_DIR, "confusion_matrix"))
     plt.clf()

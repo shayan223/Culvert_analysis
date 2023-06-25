@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 
 import argparse
-import os
-import sys
 
 
 def main():
@@ -20,22 +18,17 @@ def main():
 
     args = parser.parse_args()
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(script_dir)
-
     if args.setup_data:
-        sys.path.insert(0, os.path.join(script_dir, "src/setup_data"))
-        from main import main as setup_data_main
+        from src.setup_data import main as setup_data_main
         setup_data_main(args)
     
     if args.train_model:
         from src.engine import main as engine_main
-        engine_main(args.backbone)
+        engine_main(args)
 
     if args.validate_model:
-        sys.path.insert(0, os.path.join(script_dir, "src"))
-        from main import main as validation_main
-        validation_main()
+        from src.validation import main as validation_main
+        validation_main(args)
 
 
 if __name__ == "__main__":

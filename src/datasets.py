@@ -9,9 +9,10 @@ from torch.utils.data import DataLoader, Dataset
 
 from src.config import BATCH_SIZE, CLASSES, IMAGE_TYPE, RESIZE_TO, TRAIN_DIR, VALID_DIR
 
-from src.utils.collate_fn import collate_fn
-from src.utils.get_train_transform import get_train_transform
-from src.utils.get_valid_transform import get_valid_transform
+from src.utils import collate_fn
+from src.utils import get_train_transform
+from src.utils import get_valid_transform
+
 
 class CustomDataset(Dataset):
     def __init__(self, dir_path, width, height, classes, transforms=None):

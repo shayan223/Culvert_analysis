@@ -1,10 +1,3 @@
-"""
-NOTE: Relative paths are used in this file. These paths are relative to the root
-directory. If you intend on running This code from this file specifically, you
-must change them to go back a directory (ie. ../outputs/model rather than
-./outputs/model)
-"""
-
 import glob as glob
 import os
 
@@ -13,30 +6,34 @@ import numpy as np
 import pandas as pd
 import torch
 
-from config import (
+from src.config import (
     CLASSES,
     DETECTION_THRESHOLD,
     INFER_FALSE_LABELS,
     NUM_CLASSES,
+    NUM_QUERIES,
     NUM_EPOCHS,
+    TEST_DIR,
+    MODEL_OUT_DIR,
+    CLASSIFIED_IMAGES_DIR,
+    VALIDATION_RESULTS_DIR as VAL_RES_DIR,
 )
-from model import create_model
+from src.model import Model
 
 
-def inference():
+def inference(args):
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    model = create_model().to(device)
-    model.load_state_dict(
-        torch.load("./outputs/model" + str(NUM_EPOCHS) + ".pth", map_location=device)
+    model = Model(args.backbone, num_classes=NUM_CLASSES, num_queries=NUM_QUERIES).to(device)
+    model.model.load_state_dict(
+        torch.load(
+            os.path.join(MODEL_OUT_DIR, f"model{NUM_EPOCHS}.pth"),
+            map_location=device,
+        )
     )
-    model.eval()
+    model.model.eval()
 
-    DIR_TEST = "./big_geo_data/val"
-    OUT_DIR = "./big_geo_data/classified_images"
-    test_images = glob.glob(f"{DIR_TEST}/*")
-    print(f"Test instances: {len(test_images)}")
-
-    detection_threshold = DETECTION_THRESHOLD
+    test_images = glob.glob(f"{TEST_DIR}/*")
+    # print(f"Test instances: {len(test_images)}")
 
     col_names = ["file_name", "labels", "centroids", "x1", "x2", "y1", "y2"]
     validation_results = pd.DataFrame(columns=col_names)
@@ -55,7 +52,7 @@ def inference():
         ]
 
         validation_results["file_name"][i] = image_name
-        print("LOADING:", test_images[i])
+        # print("LOADING:", test_images[i])
 
         image = cv2.imread(test_images[i])
         orig_image = image.copy()
@@ -66,9 +63,7 @@ def inference():
         image = torch.unsqueeze(image, 0)
 
         with torch.no_grad():
-            outputs = model(image)
-
-        print(outputs)
+            outputs = model.model(image)
 
         x1_list = []
         x2_list = []
@@ -81,16 +76,15 @@ def inference():
         if len(outputs["boxes"]) != 0:
             boxes = outputs["boxes"].data.numpy()
             scores = outputs["scores"].data.numpy()
-            boxes = boxes[scores >= detection_threshold].astype(np.int32)
+            boxes = boxes[scores >= DETECTION_THRESHOLD].astype(np.int32)
             draw_boxes = boxes.copy()
             pred_classes = [
                 CLASSES[i] for i in outputs["labels"].cpu().numpy().astype(int)
             ]
 
             for j, box in enumerate(draw_boxes):
-                print(pred_classes[j])
                 if pred_classes[j] == "False" and INFER_FALSE_LABELS == False:
-                    print("Skipping False Label!")
+                    # print("Skipping False Label!")
                     continue
 
                 cv2.rectangle(
@@ -123,25 +117,25 @@ def inference():
             cv2.imshow("Prediction", orig_image)
             cv2.waitKey(1)
 
-            print(
-                os.path.join(
-                    os.getcwd(),
-                    str(os.path.basename(OUT_DIR)),
-                    os.path.split(image_name)[1] + ".jpg",
-                )
-            )
+            # print(
+            #     os.path.join(
+            #         os.getcwd(),
+            #         str(os.path.basename(CLASSIFIED_IMAGES_DIR)),
+            #         os.path.split(image_name)[1] + ".jpg",
+            #     )
+            # )
 
-            print(
-                "Save complete: ",
-                cv2.imwrite(
-                    os.path.join(
-                        os.getcwd(),
-                        OUT_DIR.lstrip("./"),
-                        os.path.split(image_name)[1] + ".jpg",
-                    ),
-                    orig_image,
-                ),
-            )
+            # print(
+            #     "Save complete: ",
+            #     cv2.imwrite(
+            #         os.path.join(
+            #             os.getcwd(),
+            #             CLASSIFIED_IMAGES_DIR.lstrip("./"),
+            #             os.path.split(image_name)[1] + ".jpg",
+            #         ),
+            #         orig_image,
+            #     ),
+            # )
 
         validation_results["x1"][i] = x1_list
         validation_results["y1"][i] = y1_list
@@ -150,14 +144,15 @@ def inference():
         validation_results["centroids"][i] = centroids_list
         validation_results["labels"][i] = labels_list
 
-        print(f"Image {i + 1} done...")
-        print("-" * 50)
+        # print(f"Image {i + 1} done...")
+        # print("-" * 50)
 
-    if not os.path.exists(OUT_DIR):
-        os.makedirs(OUT_DIR)
-    if not os.path.exists("./validation_results/"):
-        os.makedirs("./validation_results/")
-    validation_results.to_csv("./validation_results/validation_results.csv")
+    if not os.path.exists(CLASSIFIED_IMAGES_DIR):
+        os.makedirs(CLASSIFIED_IMAGES_DIR)
+    if not os.path.exists(VAL_RES_DIR):
+        os.makedirs(VAL_RES_DIR)
 
-    print("TEST PREDICTIONS COMPLETE")
+    validation_results.to_csv(f"{VAL_RES_DIR}/validation_results.csv")
+
+    # print("TEST PREDICTIONS COMPLETE")
     cv2.destroyAllWindows()

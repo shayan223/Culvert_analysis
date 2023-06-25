@@ -2,7 +2,7 @@ import math
 import os
 import random
 
-from . import config
+from src import config
 
 
 def split_files():
@@ -57,4 +57,3 @@ def split_files():
         fout.write(line + "\n")
 
     fout.close()
-    print(annotation_num, len(trainval), len(test), len(train), len(val))

@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-from . import config
+from src import config
 
 csv_file_name = config.COORDINATES_BBOX_LOCATION
 
