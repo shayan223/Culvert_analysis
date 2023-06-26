@@ -194,5 +194,5 @@ def analyse_val():
     ax.set_xlabel("Predicted labels")
     ax.set_ylabel("True labels")
 
-    plt.savefig(os.path.join(VAL_RES_DIR, "confusion_matrix"))
+    plt.savefig(os.path.join(VAL_RES_DIR, "confusion_matrix.jpg"))
     plt.clf()

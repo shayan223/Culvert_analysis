@@ -18,6 +18,10 @@ To train the model, run: `./main.py --train-model`. You can also pass the
 
 To check the accuracy of the model, run: `./main.py --validate-model`
 
+## All at Once
+
+If you don't want to run each individual command, run: `./main.py --all`.
+
 ## Directory Structure Explained
 
 1. The `./data/` directory is where all the data's stored.
