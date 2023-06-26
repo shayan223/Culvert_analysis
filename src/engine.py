@@ -87,11 +87,11 @@ class Engine:
                     train_loader, outputs["pred_boxes"], num=self.train_itr + 1
                 )
 
-            prog_bar.set_description(desc=f"Loss: {loss_value:.4f}")
+            prog_bar.set_description(desc=f"Loss: {loss_value:.3f}")
 
         return self.train_loss_list
 
-    def validate(self, valid_data_loader):
+    def validate(self, valid_data_loader, matcher):
         print("Validating")
 
         prog_bar = tqdm(valid_data_loader, total=len(valid_data_loader))
@@ -103,20 +103,24 @@ class Engine:
             targets = [{k: v.to(DEVICE) for k, v in t.items()} for t in targets]
 
             with torch.no_grad():
-                loss_dict = self.model.model(images)
+                outputs = self.model.model(images)
 
-            losses = [loss for loss in loss_dict.values()]
+            indices = matcher.forward(outputs, targets)
+            num_boxes = len(indices)
+            losses = self.model.loss_boxes(
+                outputs,
+                targets,
+                indices,
+                num_boxes,
+            )
 
-            loss_value = 0
-            for loss_tensor in losses:
-                loss_value = loss_tensor.mean().item()
-                self.val_loss_list.append(loss_value)
-                self.val_loss_hist.send(loss_value)
+            total_loss = sum(loss for loss in losses.values())
+            loss_value = total_loss.item()
 
             self.optimizer.step()
             self.val_itr += 1
 
-            prog_bar.set_description(desc=f"Loss: {loss_value:.4f}")
+            prog_bar.set_description(desc=f"Loss: {loss_value:.3f}")
 
         return self.val_loss_list
 
@@ -144,7 +148,7 @@ def main(args):
         start = time.time()
 
         train_loss = engine.train(train_loader, matcher)
-        val_loss = engine.validate(valid_loader)
+        val_loss = engine.validate(valid_loader, matcher)
 
         train_loss_hist = engine.train_loss_hist.value
         val_loss_hist = engine.val_loss_hist.value

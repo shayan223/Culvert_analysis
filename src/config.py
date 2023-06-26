@@ -8,7 +8,7 @@ DEVICE = torch.device("cuda") if is_available else torch.device("cpu")
 IMAGE_TYPE = "tif"
 CLASSES = ["Background", "True"]
 NUM_CLASSES = len(CLASSES)
-NUM_QUERIES = 10
+NUM_QUERIES = 15
 VISUALIZE_TRANSFORMED_IMAGES = False
 
 SAVE_PLOTS_EPOCH = 2
@@ -18,7 +18,7 @@ IMAGE_SPLIT_DIM = 400
 INFER_FALSE_LABELS = True
 DETECTION_THRESHOLD = 0.8
 
-BATCH_SIZE = 15
+BATCH_SIZE = 32
 RESIZE_TO = 800
 NUM_EPOCHS = 10
 
