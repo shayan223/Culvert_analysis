@@ -28,9 +28,11 @@ class Model(nn.Module):
             self.model = hub.load(
                 "facebookresearch/detr",
                 self.backbone,
-                pretrained=self.pretraind,
-                num_classes=self.num_classes,
+                pretrained=True,
+                # num_classes=self.num_classes,
             )
+
+        self.model.num_classes = self.num_classes
 
         self.in_features = self.model.class_embed.in_features
 
