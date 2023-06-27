@@ -2,7 +2,9 @@ import os
 
 import pandas as pd
 
-csv_file_name = "./coordinates_Bbox.csv"
+from src import config
+
+csv_file_name = config.COORDINATES_BBOX_LOCATION
 
 
 def xlsx_to_csv(datafile):
@@ -12,7 +14,7 @@ def xlsx_to_csv(datafile):
 
 
 def rename_files():
-    folders_path = "./Sample800"
+    folders_path = config.SAMPLES800_NORM_LOCATION
     for directname, _, files in os.walk(folders_path):
         for f in files:
             filename, ext = os.path.splitext(f)
@@ -23,6 +25,6 @@ def rename_files():
                     os.path.join(directname, new_name + ext),
                 )
 
-    xlsx_to_csv("./data/coordinate in Bbox_Sept24.xlsx")
+    xlsx_to_csv(config.COORDINATES_BBOX_XLS_LOCATION)
     df = pd.read_csv(csv_file_name)
     df.to_csv(csv_file_name)

@@ -1,6 +1,6 @@
 ###############################################################################
 # Author/Developer: Nicolas CHEN                                              #
-# Filename: plotBox.py                                                        #
+# Filename: plot.py                                                        #
 # Version: 1.0                                                                #
 # Field of research: Deep Learning in medical imaging                         #
 # Purpose: This Python script plots the boxes for each image from the dataset #
@@ -13,6 +13,8 @@ import os
 from matplotlib import patches
 import matplotlib.pyplot as plt
 import pandas as pd
+
+from src.config import DATA_ROOT
 
 
 def filterFiles(directoryPath, extension):
@@ -32,7 +34,7 @@ def filterFiles(directoryPath, extension):
 
 [image_names, numberOfFiles] = filterFiles("ImageSets", "tif")
 
-trainRCNN = pd.read_csv("test.csv", sep=",", header=None)
+trainRCNN = pd.read_csv(os.path.join(DATA_ROOT, "test.csv"), sep=",", header=None)
 trainRCNN.columns = ["filename", "box_type", "xmin", "xmax", "ymin", "ymax"]
 
 
@@ -41,7 +43,7 @@ for imageFileName in image_names:
     ax = fig.add_axes([0, 0, 1, 1])
     plt.axis("off")
 
-    image = plt.imread("Images/" + imageFileName)
+    image = plt.imread("Images" + imageFileName)
     plt.imshow(image)
 
     for _, row in trainRCNN[trainRCNN.filename == imageFileName].iterrows():
@@ -77,12 +79,13 @@ for imageFileName in image_names:
         if not os.path.exists("imagesBox"):
             os.makedirs("imagesBox")
 
+        file_name = os.path.join(DATA_ROOT, "imagesBox", os.path.splitext(imageFileName)[0])
         fig.savefig(
-            "imagesBox/" + os.path.splitext(imageFileName)[0] + ".jpg",
+            f"{file_name}.jpg",
             dpi=90,
             bbox_inches="tight",
         )
     plt.close()
-    print("ImageName: " + imageFileName + " is saved in imagesBox folder")
+    print(f"ImageName: {imageFileName} is saved in imagesBox folder")
 
 print("PLOTBOX COMPLETED!")

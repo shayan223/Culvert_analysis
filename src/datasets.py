@@ -7,8 +7,11 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-from config import BATCH_SIZE, CLASSES, IMAGE_TYPE, RESIZE_TO, TRAIN_DIR, VALID_DIR
-from utils import collate_fn, get_train_transform, get_valid_transform
+from src.config import BATCH_SIZE, CLASSES, IMAGE_TYPE
+from src.config import RESIZE_TO, TRAIN_DIR, VALID_DIR
+from src.utils import collate_fn
+from src.utils import get_train_transform
+from src.utils import get_valid_transform
 
 
 class CustomDataset(Dataset):
@@ -20,7 +23,7 @@ class CustomDataset(Dataset):
         self.classes = classes
 
         self.image_paths = glob.glob(f"{self.dir_path}/*." + IMAGE_TYPE)
-        self.all_images = [image_path.split("/")[-1] for image_path in self.image_paths]
+        self.all_images = [img.split("/")[-1] for img in self.image_paths]
         self.all_images = sorted(self.all_images)
 
     def __getitem__(self, idx):
@@ -32,7 +35,12 @@ class CustomDataset(Dataset):
         image_resized /= 255.0
 
         annot_filename = image_name[:-4] + ".xml"
-        annot_file_path = os.path.join(self.dir_path, os.path.split(annot_filename)[1])
+        annot_file_path = os.path.join(
+            self.dir_path,
+            os.path.split(
+                annot_filename,
+            )[1],
+        )
         boxes = []
         labels = []
         tree = et.parse(annot_file_path)
@@ -113,35 +121,3 @@ valid_loader = DataLoader(
 
 print(f"Number of training samples: {len(train_dataset)}")
 print(f"Number of validation samples: {len(valid_dataset)}\n")
-
-if __name__ == "__main__":
-    dataset = CustomDataset(TRAIN_DIR, RESIZE_TO, RESIZE_TO, CLASSES)
-    print(f"Number of training images: {len(dataset)}")
-
-    def visualize_sample(image, target):
-        box = target["boxes"][0]
-        label = CLASSES[target["labels"][0]]
-        cv2.rectangle(
-            image,
-            (int(box[0]), int(box[1])),
-            (int(box[2]), int(box[3])),
-            (0, 255, 0),
-            1,
-        )
-        cv2.putText(
-            image,
-            label,
-            (int(box[0]), int(box[1] - 5)),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.7,
-            (0, 0, 255),
-            2,
-        )
-
-        cv2.imshow("Image", image)
-        cv2.waitKey(0)
-
-    NUM_SAMPLES_TO_VISUALIZE = 5
-    for i in range(NUM_SAMPLES_TO_VISUALIZE):
-        image, target = dataset[i]
-        visualize_sample(image, target)

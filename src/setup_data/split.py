@@ -1,28 +1,13 @@
-import argparse as ap
 import math
 import os
 import random
 
+from src import config
+
 
 def split_files():
-    BCCD_Path = "./Sample800_norm/"
-    Out_Path = "./ImageSets/"
-
-    parser = ap.ArgumentParser()
-    parser.add_argument(
-        "--images",
-        help="Path to images",
-        default=BCCD_Path,
-    )
-    parser.add_argument(
-        "--output",
-        help="Path to output directory",
-        default=Out_Path,
-    )
-    args = vars(parser.parse_args())
-
-    images_path = args["images"]
-    output_dir = args["output"]
+    images_path = config.SAMPLES800_NORM_LOCATION
+    output_dir = config.IMAGE_SETS_LOCATION
     trainval_rate = 0.9
     train_rate = 0.8
 
@@ -36,6 +21,7 @@ def split_files():
         images_list.append(img.split(".")[0])
 
     random.shuffle(images_list)
+
     annotation_num = len(images_list)
     trainval_num = int(math.ceil(trainval_rate * annotation_num))
     train_num = int(math.ceil(trainval_num * train_rate))
@@ -71,4 +57,3 @@ def split_files():
         fout.write(line + "\n")
 
     fout.close()
-    print(annotation_num, len(trainval), len(test), len(train), len(val))

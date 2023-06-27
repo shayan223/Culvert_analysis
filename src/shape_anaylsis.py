@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from shapely.geometry import Point
+
 from src.config import IMAGE_SPLIT_DIM
 
 

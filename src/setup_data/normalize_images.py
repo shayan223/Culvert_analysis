@@ -5,10 +5,11 @@ import imageio.v2 as imageio
 import numpy as np
 from tqdm import tqdm
 
+from src import config
 
 def normalize_images():
-    PATH = "./data/CA"
-    OUT_PATH = "./Sample800_norm"
+    PATH = config.DATA_PATH
+    OUT_PATH = config.SAMPLES800_NORM_LOCATION
     FILE_TYPE = ".tif"
 
     if not os.path.exists(OUT_PATH):
@@ -34,7 +35,7 @@ def normalize_images():
 
     for filename in tqdm(file_list):
         if filename.endswith(FILE_TYPE):
-            norm = normalize_image(
-                f"{PATH}/{filename}",
-                f"{OUT_PATH}/{filename}",
+            normalize_image(
+                os.path.join(PATH, filename),
+                os.path.join(OUT_PATH, filename),
             )

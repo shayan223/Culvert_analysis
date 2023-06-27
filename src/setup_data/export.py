@@ -8,20 +8,22 @@
 # needed: filename, class_name, x1,y1,x2,y2                                   #
 ###############################################################################
 
+import os
+
 from glob import glob
 import xml.etree.ElementTree as ET
 
 import pandas as pd
 
+from src import config
+
 
 def export():
-    annotations = glob("annotations/*.xml")
+    annotations = glob(os.path.join(config.ANNOTATIONS_LOCATION, "/*.xml"))
 
     df = []
     cnt = 0
     for file in annotations:
-        print(file)
-
         filename = file.split("\\")[-1]
         filename = filename.split(".")[0] + ".tif"
         row = []
@@ -43,5 +45,5 @@ def export():
     )
 
     data[["filename", "box_type", "xmin", "xmax", "ymin", "ymax"]].to_csv(
-        "test.csv", index=False
+        os.path.join(config.DATA_ROOT, "test.csv"), index=False,
     )

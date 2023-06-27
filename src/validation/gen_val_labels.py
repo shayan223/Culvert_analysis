@@ -1,11 +1,16 @@
+import os
+
 from glob import glob
 import xml.etree.ElementTree as ET
 
 import pandas as pd
 
+from src.config import TEST_XML_DIR
+from src.config import VALIDATION_RESULTS_DIR as VAL_RES_DIR
+
 
 def gen_val_labels():
-    annotations = glob("./big_geo_data/val_xml/*.xml")
+    annotations = glob(os.path.join(TEST_XML_DIR, "*.xml"))
 
     df = []
     cnt = 0
@@ -32,5 +37,5 @@ def gen_val_labels():
     )
 
     data[["filename", "box_type", "xmin", "xmax", "ymin", "ymax"]].to_csv(
-        "./validation_results/val_labels.csv", index=False
+        os.path.join(VAL_RES_DIR, "val_labels.csv"), index=False,
     )
