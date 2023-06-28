@@ -3,3 +3,4 @@ validation_qualitative
 validation_results/*.csv
 outputs/
 data/
+/.idea

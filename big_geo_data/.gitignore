@@ -12,3 +12,5 @@ data/
 __pycache__
 *.csv
 *.zip
+culvert_dataset_combiner/*/
+culvert_dataset_combiner/*.xlsx
