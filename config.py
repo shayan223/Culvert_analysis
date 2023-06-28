@@ -30,4 +30,4 @@ SAVE_MODEL_EPOCH = 2 # save model after these many epochs
 IMAGE_SPLIT_DIM = 400 # nxn dimension to split larger shape files into, for classification
 INFER_FALSE_LABELS = False
 
-DETECTION_THRESHOLD = 0.8
+DETECTION_THRESHOLD = 0.1

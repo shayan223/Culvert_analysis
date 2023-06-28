@@ -6,6 +6,7 @@ from model import create_model
 from config import NUM_EPOCHS, SAVE_MODEL_EPOCH, NUM_CLASSES, CLASSES, INFER_FALSE_LABELS,DETECTION_THRESHOLD
 import os
 import pandas as pd
+import copy
 
 '''
 NOTE: Relative paths are used in this file. These paths are relative to the root directory. If you intend on running
@@ -19,10 +20,11 @@ def inference():
     # set the computation device
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     # load the model and the trained weights
-    model = create_model(num_classes=NUM_CLASSES).to(device)
-    model.load_state_dict(torch.load(
-        './outputs/model'+str(NUM_EPOCHS)+'.pth', map_location=device
-    ))
+    
+    #NOTE: AFTER TRAINING BASED ON THIS OFFICIAL YOLO TUTORIAL: https://docs.ultralytics.com/yolov5/tutorials/train_custom_data/#13-organize-directories
+    #Load weights from the path which you stored the model weights
+    model = torch.hub.load('ultralytics/yolov5', 'custom', '../yolov5/runs/train/exp15/weights/best.pt')
+
     model.eval()
 
 
@@ -45,28 +47,56 @@ def inference():
         image_name = test_images[i].split('/')[-1].split('.')[0]
 
         #create new dataframe row
-        validation_results.loc[validation_results.shape[0]] = [None,None,None,None,None,None,None]
+        #validation_results.loc[len(validation_results.index)] = [[],[],[],[],[],[],[]]
+        row_dict = {'file_name': None, 'labels':None, 'centroids':[], 'x1':[], 'x2':[], 'y1':[], 'y2':[]}
+        #validation_results = validation_results.append(row_dict, ignore_index=True)
+        
         #Store current image name
-        validation_results['file_name'][i] = image_name
+        row_dict['file_name'] = image_name
         print("LOADING:", test_images[i])
         image = cv2.imread(test_images[i])
         orig_image = image.copy()
         # BGR to RGB
         image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB).astype(np.float32)
         # make the pixel range between 0 and 1
-        image /= 255.0
+        #image /= 255.0
         # bring color channels to front
-        image = np.transpose(image, (2, 0, 1)).astype(float)
+        #image = np.transpose(image, (2, 0, 1)).astype(float)
         # convert to tensor
-        image = torch.tensor(image, dtype=torch.float).cuda()
+        #image = torch.tensor(image, dtype=torch.float).cuda()
         # add batch dimension
-        image = torch.unsqueeze(image, 0)
+        #image = torch.unsqueeze(image, 0)
         with torch.no_grad():
             outputs = model(image)
+            outputs = outputs.pandas().xyxy[0]
+            print(outputs)
 
+        out_dict = {'boxes': [],
+                    'scores': [],
+                    'labels': []}
+
+        if not outputs.empty:
+            cur_box = []
+            for i in range(outputs.shape[0]):
+                cur_box.append(outputs.iloc[i]['xmin'])
+                cur_box.append(outputs.iloc[i]['ymin'])
+                cur_box.append(outputs.iloc[i]['xmax'])
+                cur_box.append(outputs.iloc[i]['ymax'])
+                #cur_box = np.array(cur_box)
+                out_dict['boxes'].append(cur_box)
+                out_dict['scores'].append(outputs.iloc[i]['confidence'])
+                out_dict['labels'].append(outputs.iloc[i]['class'])
+
+                cur_box = []
+
+            out_dict['scores'] = torch.FloatTensor(out_dict['scores'])
+            out_dict['boxes'] = torch.FloatTensor(out_dict['boxes'])
+            out_dict['labels'] = torch.FloatTensor(out_dict['labels'])
+            
+        outputs = out_dict
         # load all detection to CPU for further operations
-        outputs = [{k: v.to('cpu') for k, v in t.items()} for t in outputs]
-        outputs = outputs[0]
+        #outputs = [{k: v.to('cpu') for k, v in t.items()} for t in outputs]
+        #outputs = outputs[0]
 
         print(outputs)
 
@@ -87,7 +117,7 @@ def inference():
             draw_boxes = boxes.copy()
             # get all the predicited class names
             pred_classes = [CLASSES[i] for i in outputs['labels'].cpu().numpy().astype(int)]
-
+            #pred_classes = outputs['labels']
             # draw the bounding boxes and write the class name on top of it
             for j, box in enumerate(draw_boxes):
                 print(pred_classes[j])
@@ -116,21 +146,25 @@ def inference():
             print(os.path.join(os.getcwd(), str(os.path.basename(OUT_DIR)) , os.path.split(image_name)[1]+'.jpg'))
             print('Save complete: ',cv2.imwrite(os.path.join(os.getcwd(), OUT_DIR.lstrip('./') , os.path.split(image_name)[1]+'.jpg'), orig_image, ))
     
-        validation_results['x1'][i] = x1_list
-        validation_results['y1'][i] = y1_list
-        validation_results['x2'][i] = x2_list
-        validation_results['y2'][i] = y2_list
-        validation_results['centroids'][i] = centroids_list
-        validation_results['labels'][i] = labels_list
+        row_dict['x1'] = x1_list
+        row_dict['y1'] = y1_list
+        row_dict['x2'] = x2_list
+        row_dict['y2'] = y2_list
+        row_dict['centroids'] = centroids_list
+        row_dict['labels'] = labels_list
+
+        validation_results = validation_results.append(row_dict, ignore_index=True)
 
         print(f"Image {i + 1} done...")
         print('-' * 50)
+
 
 
     if not os.path.exists(OUT_DIR):
         os.makedirs(OUT_DIR)
     if not os.path.exists('./validation_results/'):
         os.makedirs('./validation_results/')
+    print(validation_results)
     validation_results.to_csv('./validation_results/validation_results.csv')
     print('TEST PREDICTIONS COMPLETE')
     cv2.destroyAllWindows()
