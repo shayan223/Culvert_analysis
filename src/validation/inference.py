@@ -150,8 +150,8 @@ def inference(args):
             centroids_list.append(((x1 + x2) / 2, (y1 + y2) / 2))
 
         # show image
-        # cv2.imshow("Prediction", orig_image)
-        # cv2.waitKey(1)
+        cv2.imshow("Prediction", orig_image)
+        cv2.waitKey(1)
 
         # new image path
         print(CLASSIFIED_IMAGES_DIR)
