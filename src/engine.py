@@ -29,7 +29,7 @@ class Engine:
             num_classes=self.num_classes,
             num_queries=self.num_queries,
         )
-        self.optimizer = optim.Adam(self.model.parameters(), lr=0.001)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)
 
         self.train_loss_list = []
         self.val_loss_list = []
@@ -41,12 +41,6 @@ class Engine:
         self.val_itr = 0
 
         self.params = [p for p in self.model.parameters() if p.requires_grad]
-        self.optimizer = torch.optim.SGD(
-            self.params,
-            lr=0.001,
-            momentum=0.9,
-            weight_decay=0.0005,
-        )
 
     def train(self, train_data_loader, matcher):
         print("Training")
@@ -62,6 +56,7 @@ class Engine:
 
             self.optimizer.zero_grad()
 
+            self.model.train(True)
             outputs = self.model.model(images)
 
             indices = matcher.forward(outputs, targets)

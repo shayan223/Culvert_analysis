@@ -37,7 +37,7 @@ def analyse_val():
         label_list = literal_eval(row.iloc[0]["labels"])
 
         for i in label_list:
-            current_labels.append(literal_eval(i))
+            current_labels.append(literal_eval(f"'{i}'"))
 
         centroid_list = literal_eval(row.iloc[0]["centroids"])
         x1_list = literal_eval(row.iloc[0]["x1"])
@@ -178,6 +178,7 @@ def analyse_val():
     label_miss_rate = labels_missed / total_true_labels
     extra_label_rate = extra_labels / total_true_labels
 
+    y_pred = [True if val == "True" else False for val in y_pred]
     conf_mat = confusion_matrix(y, y_pred)
     print(conf_mat)
 

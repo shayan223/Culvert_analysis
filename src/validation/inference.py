@@ -91,7 +91,7 @@ def inference(args):
 
         # propagate through the model
         with torch.no_grad():
-            outputs, targets = model.model(image)
+            outputs = model.model(image)
 
         x1_list = []
         x2_list = []
@@ -101,43 +101,32 @@ def inference(args):
         centroids_list = []
         labels_list = []
 
-        # iterate over predictions
-        pred_logits = outputs["pred_logits"][0][:, :len(CLASSES)]
-        pred_boxes = outputs["pred_boxes"][0]
+        pred_logits=outputs['pred_logits'][0][:, :len(CLASSES)]
+        pred_boxes=outputs['pred_boxes'][0]
 
-        # keep only predictions with confidence above threshold
         max_output = pred_logits.softmax(-1).max(-1)
-        topk = max_output.values.topk(15)
+        topk = max_output.values.topk(2)
 
-        # iterate over topk predictions
         pred_logits = pred_logits[topk.indices]
         pred_boxes = pred_boxes[topk.indices]
+        pred_logits.shape
 
-        # iterate over predictions
         for logits, box in zip(pred_logits, pred_boxes):
-            # skip predictions with confidence below threshold
             cls = logits.argmax()
             if cls >= len(CLASSES):
                 continue
-
-            # get label
             label = CLASSES[cls]
-
-            # skip false labels
-            if label == "False" and not INFER_FALSE_LABELS:
-                print("Skipping False Label!")
-                continue
-
-            # get bounding box coordinates
-            x1, y1, x2, y2 = int(box[0]), int(box[1]), int(box[2]), int(box[3])
+            box = box.cpu() * torch.Tensor([800, 800, 800, 800])
+            x, y, w, h = box
+            x1, x2 = int(x-w//2), int(x+w//2)
+            y1, y2 = int(y-h//2), int(y+h//2)
 
             # draw bounding box
             cv2.rectangle(
-                orig_image,
-                (x1, y1),
-                (x2, y2),
-                (0, 0, 255),
-                16,
+                img=orig_image,
+                rec=[x1, y1, x2, y2],
+                color=(0, 0, 255),
+                thickness=5,
             )
 
             # draw label
@@ -161,20 +150,20 @@ def inference(args):
 
         # show image
         cv2.imshow("Prediction", orig_image)
-        cv2.waitKey(0)
+        cv2.waitKey(1)
 
         # new image path
+        print(CLASSIFIED_IMAGES_DIR)
         output_image_path = os.path.join(
-            os.getcwd(),
-            str(os.path.basename(CLASSIFIED_IMAGES_DIR)),
-            os.path.split(image_name)[1] + ".jpg",
+            CLASSIFIED_IMAGES_DIR, os.path.split(image_name)[1] + ".jpg",
         )
 
         # output image path
         print(output_image_path)
 
         # save image
-        print(f"Save complete: {cv2.imwrite(output_image_path, orig_image)}")
+        saved = cv2.imwrite(output_image_path, orig_image)
+        print(f"Save complete: {saved}")
 
         validation_results["x1"][i] = x1_list
         validation_results["y1"][i] = y1_list
@@ -185,8 +174,6 @@ def inference(args):
 
         print(f"Image {i + 1} done.")
         print("-" * 50)
-
-        break
 
     validation_results.to_csv(f"{VAL_RES_DIR}/validation_results.csv")
 

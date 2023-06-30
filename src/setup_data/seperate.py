@@ -16,7 +16,7 @@ def seperate_files():
         if not os.path.exists(destination):
             os.makedirs(destination)
 
-        if not validation:
+        if validation:
             if not os.path.exists(f"{destination}_xml"):
                 os.makedirs(f"{destination}_xml")
 

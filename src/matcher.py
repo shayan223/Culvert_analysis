@@ -1,21 +1,22 @@
-import torch
-from scipy.optimize import linear_sum_assignment
-from torch import nn
+"""
+https://github.com/facebookresearch/detr/blob/main/models/matcher.py
+"""
 
-from src.utils.box_ops import box_cxcywh_to_xyxy, generalized_box_iou
+import torch
+import torch.nn as nn
+
+from scipy.optimize import linear_sum_assignment
+
+from src.utils import box_ops
 
 
 class HungarianMatcher(nn.Module):
-    def __init__(
-        self, cost_class: float = 1, cost_bbox: float = 1, cost_giou: float = 1
-    ):
+    def __init__(self, cost_class: float = 1, cost_bbox: float = 1, cost_giou: float = 1):
         super().__init__()
         self.cost_class = cost_class
         self.cost_bbox = cost_bbox
         self.cost_giou = cost_giou
-        assert (
-            cost_class != 0 or cost_bbox != 0 or cost_giou != 0
-        ), "all costs cant be 0"
+        assert cost_class != 0 or cost_bbox != 0 or cost_giou != 0, "all costs cant be 0"
 
     @torch.no_grad()
     def forward(self, outputs, targets):
@@ -31,28 +32,11 @@ class HungarianMatcher(nn.Module):
 
         cost_bbox = torch.cdist(out_bbox, tgt_bbox, p=1)
 
-        cost_giou = -generalized_box_iou(
-            box_cxcywh_to_xyxy(out_bbox), box_cxcywh_to_xyxy(tgt_bbox)
-        )
+        cost_giou = -box_ops.generalized_box_iou(box_ops.box_cxcywh_to_xyxy(out_bbox), box_ops.box_cxcywh_to_xyxy(tgt_bbox))
 
-        C = (
-            self.cost_bbox * cost_bbox
-            + self.cost_class * cost_class
-            + self.cost_giou * cost_giou
-        )
+        C = self.cost_bbox * cost_bbox + self.cost_class * cost_class + self.cost_giou * cost_giou
         C = C.view(bs, num_queries, -1).cpu()
 
         sizes = [len(v["boxes"]) for v in targets]
-        indices = [
-            linear_sum_assignment(c[i])
-            for i, c in enumerate(
-                C.split(sizes, -1),
-            )
-        ]
-        return [
-            (
-                torch.as_tensor(i, dtype=torch.int64),
-                torch.as_tensor(j, dtype=torch.int64),
-            )
-            for i, j in indices
-        ]
+        indices = [linear_sum_assignment(c[i]) for i, c in enumerate(C.split(sizes, -1))]
+        return [(torch.as_tensor(i, dtype=torch.int64), torch.as_tensor(j, dtype=torch.int64)) for i, j in indices]
