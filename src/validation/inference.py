@@ -47,8 +47,7 @@ def inference(args):
 
     # load model
     checkpoint = torch.load(
-        # os.path.join(MODEL_OUT_DIR, f"model{NUM_EPOCHS}.pth"),
-        os.path.join(MODEL_OUT_DIR, f"model10.pth"),
+        os.path.join(MODEL_OUT_DIR, f"model{NUM_EPOCHS}.pth"),
         map_location=device,
     )
     model.model.load_state_dict(checkpoint, strict=False)
