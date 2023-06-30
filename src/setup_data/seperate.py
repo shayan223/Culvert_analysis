@@ -16,7 +16,7 @@ def seperate_files():
         if not os.path.exists(destination):
             os.makedirs(destination)
 
-        if not validation:
+        if validation:
             if not os.path.exists(f"{destination}_xml"):
                 os.makedirs(f"{destination}_xml")
 
@@ -40,7 +40,7 @@ def seperate_files():
 
     image_sets = config.IMAGE_SETS_LOCATION
     data_root = config.DATA_ROOT
-    seperate_images(f"{image_sets}/train.txt", IMAGE_DIR, f"{data_root}/train")
-    seperate_images(f"{image_sets}/test.txt", IMAGE_DIR, f"{data_root}/test")
-    seperate_images(f"{image_sets}/trainval.txt", IMAGE_DIR, f"{data_root}/trainval")
+    # seperate_images(f"{image_sets}/train.txt", IMAGE_DIR, f"{data_root}/train")
+    # seperate_images(f"{image_sets}/test.txt", IMAGE_DIR, f"{data_root}/test")
+    # seperate_images(f"{image_sets}/trainval.txt", IMAGE_DIR, f"{data_root}/trainval")
     seperate_images(f"{image_sets}/val.txt", IMAGE_DIR, f"{data_root}/val", validation=True)

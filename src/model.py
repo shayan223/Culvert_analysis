@@ -4,6 +4,7 @@ import torch
 from torch import hub, nn
 import torch.nn.functional as F
 
+from src.config import DEVICE
 from src.utils import box_ops
 
 
@@ -32,7 +33,8 @@ class Model(nn.Module):
                 # num_classes=self.num_classes,
             )
 
-        self.model.num_classes = self.num_classes
+        # self.model.num_classes = self.num_classes
+        self.model.to(DEVICE)
 
         self.in_features = self.model.class_embed.in_features
 

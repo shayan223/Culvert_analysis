@@ -5,8 +5,11 @@
 1. Install all the required libraries via: `pip3 install -r ./requirements.txt`.
 2. Un-zip samples inside the `./data/` directory.
 3. To setup the data, run the following command: `./main.py --setup-data
-   --first-time-setup` **NOTE:** After running the previous command, you may need
-   to run the following: `./main.py --setup-data`.
+   --first-time-setup`.
+
+## Configuration
+
+All the configuration is available in the `src/config.py` file.
 
 ## Train the Model
 

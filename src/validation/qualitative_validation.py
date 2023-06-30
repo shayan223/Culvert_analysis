@@ -50,7 +50,7 @@ def qualitative_validation():
         ax = fig.add_axes([0, 0, 1, 1])
         plt.axis("off")
 
-        image = plt.imread(VAL_PATH + imageFileName)
+        image = plt.imread(os.path.join(VAL_PATH, imageFileName))
 
         plt.imshow(image)
 

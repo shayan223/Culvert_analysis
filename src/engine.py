@@ -56,6 +56,7 @@ class Engine:
 
             self.optimizer.zero_grad()
 
+            self.model.train(True)
             outputs = self.model.model(images)
 
             indices = matcher.forward(outputs, targets)
